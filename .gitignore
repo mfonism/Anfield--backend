@@ -1,5 +1,7 @@
 /node_modules
 /spec
+/env
+/secrets
 
 npm-debug.log
 .DS_Store
