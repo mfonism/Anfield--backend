@@ -1,5 +1,6 @@
 import { Request, Response, Router } from 'express';
-import { BAD_REQUEST, OK } from 'http-status-codes';
+import { ParamsDictionary } from 'express-serve-static-core';
+import { BAD_REQUEST, NOT_FOUND, OK } from 'http-status-codes';
 import { from } from 'rxjs';
 import { first, map } from 'rxjs/operators';
 
@@ -9,7 +10,7 @@ import db from './../db/firebase-db';
 const router = Router();
 
 
-router.get('/check', async (req: Request, res: Response) => {
+router.get('/all', async (req: Request, res: Response) => {
 
     from(db.collection('Trophies').get())
     .pipe(
@@ -22,8 +23,30 @@ router.get('/check', async (req: Request, res: Response) => {
         })
     )
     .subscribe(
-        (data:  any) => { res.status(OK).json({'data': data})},
-        (error: any) => { res.status(BAD_REQUEST).json({'error': error.message })}
+        (data:  any) => { return res.status(OK).json({'data': data}) },
+        (error: any) => { return res.status(BAD_REQUEST).json({'error': error.message }) }
+    )
+});
+
+
+router.get('/:id', async (req: Request, res: Response) => {
+
+    const { id } = req.params as ParamsDictionary;
+
+    from(db.collection('Trophies').doc(id).get())
+    .pipe(
+        first(),
+        map((snapshot: any) => { return snapshot.data() })
+    )
+    .subscribe(
+        (data:  any) => { 
+            if (data) {
+                return res.status(OK).json({'data': data})
+            } else {
+                return res.status(NOT_FOUND).json({'error': 'Trophy not found!'})
+            }
+        },
+        (error: any) => { res.status(BAD_REQUEST).json({'error': error.message }) }
     )
 });
 
