@@ -6,8 +6,23 @@ import { first, map } from 'rxjs/operators';
 
 import db from './../db/firebase-db';
 
-
 const router = Router();
+
+
+/**
+ * Returns an array containing data from the documents in a snapshot.
+ * The data in the returned array, for each document, contains the
+ * `id` of the respective document.
+ *
+ * @param snapshot - The input snapshot
+ */
+function arraylizeSnapshot(snapshot: any) {
+    return snapshot.docs
+        .reduce((acc: any, doc: any) => {
+            acc.push({'id': doc.id, ...doc.data()});
+            return acc
+        }, new Array())
+}
 
 
 router.get('/all', async (req: Request, res: Response) => {
@@ -15,17 +30,13 @@ router.get('/all', async (req: Request, res: Response) => {
     from(db.collection('Trophies').get())
     .pipe(
         first(),
-        map((snapshot: any) => {
-            return snapshot.docs.reduce((acc: any, doc: any) => {
-                acc.push(doc.data());
-                return acc
-            }, new Array())
-        })
+        map((snapshot: any) => arraylizeSnapshot(snapshot))
     )
     .subscribe(
-        (data:  any) => { return res.status(OK).json({'data': data}) },
-        (error: any) => { return res.status(BAD_REQUEST).json({'error': error.message }) }
+        (data:  any) => res.status(OK).json({'data': data}),
+        (error: any) => res.status(BAD_REQUEST).json({'error': error.message})
     )
+
 });
 
 
