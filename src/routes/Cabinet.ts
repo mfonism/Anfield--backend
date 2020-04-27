@@ -47,18 +47,16 @@ router.get('/:id', async (req: Request, res: Response) => {
     from(db.collection('Trophies').doc(id).get())
     .pipe(
         first(),
-        map((snapshot: any) => { return snapshot.data() })
+        map((snapshot: any) => snapshot.data())
     )
     .subscribe(
-        (data:  any) => { 
-            if (data) {
-                return res.status(OK).json({'data': data})
-            } else {
-                return res.status(NOT_FOUND).json({'error': 'Trophy not found!'})
-            }
-        },
-        (error: any) => { res.status(BAD_REQUEST).json({'error': error.message }) }
+        (data:  any) =>
+            data
+            ? res.status(OK).json({'data': data})
+            : res.status(NOT_FOUND).json({'error': 'Trophy not found!'}),
+        (error: any) => res.status(BAD_REQUEST).json({'error': error.message })
     )
+
 });
 
 export default router;
