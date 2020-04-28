@@ -59,5 +59,14 @@ app.get('*', (req: Request, res: Response) => {
     res.sendFile('index.html', {root: viewsDir});
 });
 
+const cors = require('cors');
+
+var corsOptions = {
+    'origin': process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN : 'localhost:4000',
+    'optionsSuccessStatus': 200
+}
+
+app.use(cors(corsOptions));
+
 // Export express instance
 export default app;
