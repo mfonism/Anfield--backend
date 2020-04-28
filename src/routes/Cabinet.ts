@@ -17,11 +17,11 @@ const router = Router();
 
 /****************************************************************
 *
-*    CREATE -- POST  /api/trophies/add
+*    CREATE -- POST  /api/trophies/
 *
 *****************************************************************/
 
-router.post('/add', async (req: Request, res: Response) => {
+router.post('/', async (req: Request, res: Response) => {
     
     const { place, tournament, year } = req.body;
 
@@ -49,11 +49,11 @@ router.post('/add', async (req: Request, res: Response) => {
 
 /****************************************************************
 *
-*    RETRIEVE all -- GET  /api/trophies/all
+*    RETRIEVE all -- GET  /api/trophies/
 *
 *****************************************************************/
 
-router.get('/all', async (req: Request, res: Response) => {
+router.get('/', async (req: Request, res: Response) => {
 
     from<Observable<QuerySnapshot>>(db.collection('Trophies').get())
     .pipe(
@@ -138,6 +138,7 @@ router.put('/:id', async (req: Request, res: Response) => {
         () => res.status(OK).json({'data': {'id': id, 'changes': changes}}),
         error => res.status(BAD_REQUEST).json({'error': error.message})
     )
+
 })
 
 
@@ -156,6 +157,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
         () => res.status(NO_CONTENT).json({}),
         error => res.status(BAD_REQUEST).json({'error': error.message})
     )
+
 })
 
 
