@@ -43,6 +43,14 @@ router.post('/add', async (req: Request, res: Response) => {
 
 })
 
+
+
+/****************************************************************
+*
+*    RETRIEVE <all> -- GET  /api/trophies/all
+*
+*****************************************************************/
+
 /**
  * Returns an array containing data from the documents in a snapshot.
  * The data in the returned array, for each document, contains the
