@@ -2,7 +2,7 @@ import { Request, Response, Router } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { DocumentSnapshot, DocumentReference, QuerySnapshot } from '@firebase/firestore-types';
 import { BAD_REQUEST, CREATED, NOT_FOUND, OK } from 'http-status-codes';
-import { from } from 'rxjs';
+import { from, Observable } from 'rxjs';
 import { first, map } from 'rxjs/operators';
 
 import db from './../db/firebase-db';
@@ -14,7 +14,7 @@ const router = Router();
 
 /****************************************************************
 *
-*    CREATE -- POST  /api/trophies/
+*    CREATE -- POST  /api/trophies/add
 *
 *****************************************************************/
 
@@ -26,11 +26,11 @@ router.post('/add', async (req: Request, res: Response) => {
         return res.status(BAD_REQUEST).json({'error': paramMissingError})
     }
 
-    from(db.collection('Trophies').add({
+    from<Observable<DocumentReference>>(db.collection('Trophies').add({
         'place': place, 'tournament': tournament, 'year': Number(year)
     }))
     .subscribe(
-        (docRef: any) => res.status(CREATED).json({
+        (docRef: DocumentReference) => res.status(CREATED).json({
             'data': {
                 'id': docRef.id,
                 'place': place,
