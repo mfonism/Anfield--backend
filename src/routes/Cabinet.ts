@@ -4,7 +4,7 @@ import {
     DocumentSnapshot, DocumentReference, QueryDocumentSnapshot,
     QuerySnapshot
 } from '@firebase/firestore-types';
-import { BAD_REQUEST, CREATED, NOT_FOUND, OK } from 'http-status-codes';
+import { BAD_REQUEST, CREATED, NO_CONTENT, NOT_FOUND, OK } from 'http-status-codes';
 import { from, Observable } from 'rxjs';
 import { first, map } from 'rxjs/operators';
 
@@ -103,7 +103,7 @@ router.get('/:id', async (req: Request, res: Response) => {
     .subscribe(
         data =>
             data
-            ? res.status(OK).json({'data': data})
+            ? res.status(OK).json({'data': {'id': id, ...data}})
             : res.status(NOT_FOUND).json({'error': 'Trophy not found!'}),
         error => res.status(BAD_REQUEST).json({'error': error.message })
     )
@@ -136,6 +136,24 @@ router.put('/:id', async (req: Request, res: Response) => {
     from<Observable<any>>(db.collection('Trophies').doc(id).update(changes))
     .subscribe(
         () => res.status(OK).json({'data': {'id': id, 'changes': changes}}),
+        error => res.status(BAD_REQUEST).json({'error': error.message})
+    )
+})
+
+
+/****************************************************************
+*
+*    DELETE -- DELETE  /api/trophies/:id
+*
+*****************************************************************/
+
+router.delete('/:id', async (req: Request, res: Response) => {
+
+    const { id } = req.params as ParamsDictionary;
+
+    from<Observable<any>>(db.collection('Trophies').doc(id).delete())
+    .subscribe(
+        () => res.status(NO_CONTENT).json({}),
         error => res.status(BAD_REQUEST).json({'error': error.message})
     )
 })
