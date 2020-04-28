@@ -87,23 +87,25 @@ function arraylizeSnapshot(snapshot: QuerySnapshot): Array<any> {
 *    RETRIEVE one -- GET  /api/trophies/:id
 *
 *****************************************************************/
+
 router.get('/:id', async (req: Request, res: Response) => {
 
     const { id } = req.params as ParamsDictionary;
 
-    from(db.collection('Trophies').doc(id).get())
+    from<Observable<DocumentSnapshot>>(db.collection('Trophies').doc(id).get())
     .pipe(
-        first<any, DocumentSnapshot>(),
+        first(),
         map((snapshot: DocumentSnapshot) => snapshot.data())
     )
     .subscribe(
-        (data:  any) =>
+        data =>
             data
             ? res.status(OK).json({'data': data})
             : res.status(NOT_FOUND).json({'error': 'Trophy not found!'}),
-        (error: any) => res.status(BAD_REQUEST).json({'error': error.message })
+        error => res.status(BAD_REQUEST).json({'error': error.message })
     )
 
 });
+
 
 export default router;
