@@ -1,14 +1,47 @@
 import { Request, Response, Router } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
-import { DocumentSnapshot, QuerySnapshot } from '@firebase/firestore-types';
-import { BAD_REQUEST, NOT_FOUND, OK } from 'http-status-codes';
+import { DocumentSnapshot, DocumentReference, QuerySnapshot } from '@firebase/firestore-types';
+import { BAD_REQUEST, CREATED, NOT_FOUND, OK } from 'http-status-codes';
 import { from } from 'rxjs';
 import { first, map } from 'rxjs/operators';
 
 import db from './../db/firebase-db';
+import { paramMissingError } from '@shared/constants';
 
 const router = Router();
 
+
+
+/****************************************************************
+*
+*    CREATE -- POST  /api/trophies/
+*
+*****************************************************************/
+
+router.post('/add', async (req: Request, res: Response) => {
+    
+    const { place, tournament, year } = req.body;
+
+    if (!place || !tournament || !year) {
+        return res.status(BAD_REQUEST).json({'error': paramMissingError})
+    }
+
+    from(db.collection('Trophies').add({
+        'place': place, 'tournament': tournament, 'year': Number(year)
+    }))
+    .subscribe(
+        (docRef: any) => res.status(CREATED).json({
+            'data': {
+                'id': docRef.id,
+                'place': place,
+                'tournament': tournament,
+                'year': Number(year)
+            } 
+        }),
+        (error: any) => res.status(BAD_REQUEST).json({'error': error.message})
+    )
+
+})
 
 /**
  * Returns an array containing data from the documents in a snapshot.
