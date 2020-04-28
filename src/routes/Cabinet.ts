@@ -108,4 +108,34 @@ router.get('/:id', async (req: Request, res: Response) => {
 });
 
 
+/****************************************************************
+*
+*    UPDATE -- PUT  /api/trophies/:id
+*
+*****************************************************************/
+
+router.put('/:id', async (req: Request, res: Response) => {
+
+    const { id } = req.params as ParamsDictionary;
+    const { place, tournament, year } = req.body;
+
+    var changes: any = {};
+    if (place) {
+        changes['place'] = place;
+    }
+    if (tournament) {
+        changes['tournament'] = tournament;
+    }
+    if (year) {
+        changes['year'] = Number(year);
+    }
+
+    from<Observable<any>>(db.collection('Trophies').doc(id).update(changes))
+    .subscribe(
+        () => res.status(OK).json({'data': {'id': id, 'changes': changes}}),
+        error => res.status(BAD_REQUEST).json({'error': error.message})
+    )
+})
+
+
 export default router;
