@@ -82,7 +82,11 @@ function arraylizeSnapshot(snapshot: QuerySnapshot): Array<any> {
 }
 
 
-
+/****************************************************************
+*
+*    RETRIEVE one -- GET  /api/trophies/:id
+*
+*****************************************************************/
 router.get('/:id', async (req: Request, res: Response) => {
 
     const { id } = req.params as ParamsDictionary;
