@@ -30,7 +30,7 @@ router.post('/add', async (req: Request, res: Response) => {
         'place': place, 'tournament': tournament, 'year': Number(year)
     }))
     .subscribe(
-        (docRef: DocumentReference) => res.status(CREATED).json({
+        docRef => res.status(CREATED).json({
             'data': {
                 'id': docRef.id,
                 'place': place,
@@ -38,18 +38,32 @@ router.post('/add', async (req: Request, res: Response) => {
                 'year': Number(year)
             } 
         }),
-        (error: any) => res.status(BAD_REQUEST).json({'error': error.message})
+        error => res.status(BAD_REQUEST).json({'error': error.message})
     )
 
 })
 
 
-
 /****************************************************************
 *
-*    RETRIEVE <all> -- GET  /api/trophies/all
+*    RETRIEVE all -- GET  /api/trophies/all
 *
 *****************************************************************/
+
+router.get('/all', async (req: Request, res: Response) => {
+
+    from<Observable<QuerySnapshot>>(db.collection('Trophies').get())
+    .pipe(
+        first(),
+        map((snapshot: QuerySnapshot) => arraylizeSnapshot(snapshot))
+    )
+    .subscribe(
+        (data: Array<any>) => res.status(OK).json({'data': data}),
+        error => res.status(BAD_REQUEST).json({'error': error.message})
+    )
+
+});
+
 
 /**
  * Returns an array containing data from the documents in a snapshot.
@@ -58,6 +72,7 @@ router.post('/add', async (req: Request, res: Response) => {
  *
  * @param snapshot - The input snapshot
  */
+
 function arraylizeSnapshot(snapshot: QuerySnapshot): Array<any> {
     return snapshot.docs
         .reduce((acc: Array<any>, doc: DocumentSnapshot) => {
@@ -66,20 +81,6 @@ function arraylizeSnapshot(snapshot: QuerySnapshot): Array<any> {
         }, new Array<any>())
 }
 
-
-router.get('/all', async (req: Request, res: Response) => {
-
-    from(db.collection('Trophies').get())
-    .pipe(
-        first<any, QuerySnapshot>(),
-        map((snapshot: QuerySnapshot) => arraylizeSnapshot(snapshot))
-    )
-    .subscribe(
-        (data: Array<any>) => res.status(OK).json({'data': data}),
-        (error: any) => res.status(BAD_REQUEST).json({'error': error.message})
-    )
-
-});
 
 
 router.get('/:id', async (req: Request, res: Response) => {
