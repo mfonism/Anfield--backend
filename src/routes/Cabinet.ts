@@ -1,6 +1,9 @@
 import { Request, Response, Router } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
-import { DocumentSnapshot, DocumentReference, QuerySnapshot } from '@firebase/firestore-types';
+import {
+    DocumentSnapshot, DocumentReference, QueryDocumentSnapshot,
+    QuerySnapshot
+} from '@firebase/firestore-types';
 import { BAD_REQUEST, CREATED, NOT_FOUND, OK } from 'http-status-codes';
 import { from, Observable } from 'rxjs';
 import { first, map } from 'rxjs/operators';
@@ -75,7 +78,7 @@ router.get('/all', async (req: Request, res: Response) => {
 
 function arraylizeSnapshot(snapshot: QuerySnapshot): Array<any> {
     return snapshot.docs
-        .reduce((acc: Array<any>, doc: DocumentSnapshot) => {
+        .reduce((acc: Array<any>, doc: DocumentSnapshot | QueryDocumentSnapshot) => {
             acc.push({'id': doc.id, ...doc.data()});
             return acc
         }, new Array<any>())
