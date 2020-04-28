@@ -1,5 +1,6 @@
 import { Request, Response, Router } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
+import { DocumentSnapshot, QuerySnapshot } from '@firebase/firestore-types';
 import { BAD_REQUEST, NOT_FOUND, OK } from 'http-status-codes';
 import { from } from 'rxjs';
 import { first, map } from 'rxjs/operators';
@@ -16,12 +17,12 @@ const router = Router();
  *
  * @param snapshot - The input snapshot
  */
-function arraylizeSnapshot(snapshot: any) {
+function arraylizeSnapshot(snapshot: QuerySnapshot): Array<any> {
     return snapshot.docs
-        .reduce((acc: any, doc: any) => {
+        .reduce((acc: Array<any>, doc: DocumentSnapshot) => {
             acc.push({'id': doc.id, ...doc.data()});
             return acc
-        }, new Array())
+        }, new Array<any>())
 }
 
 
@@ -29,11 +30,11 @@ router.get('/all', async (req: Request, res: Response) => {
 
     from(db.collection('Trophies').get())
     .pipe(
-        first(),
-        map((snapshot: any) => arraylizeSnapshot(snapshot))
+        first<any, QuerySnapshot>(),
+        map((snapshot: QuerySnapshot) => arraylizeSnapshot(snapshot))
     )
     .subscribe(
-        (data:  any) => res.status(OK).json({'data': data}),
+        (data: Array<any>) => res.status(OK).json({'data': data}),
         (error: any) => res.status(BAD_REQUEST).json({'error': error.message})
     )
 
@@ -46,8 +47,8 @@ router.get('/:id', async (req: Request, res: Response) => {
 
     from(db.collection('Trophies').doc(id).get())
     .pipe(
-        first(),
-        map((snapshot: any) => snapshot.data())
+        first<any, DocumentSnapshot>(),
+        map((snapshot: DocumentSnapshot) => snapshot.data())
     )
     .subscribe(
         (data:  any) =>
