@@ -6,7 +6,7 @@ import {
 } from '@firebase/firestore-types';
 import { BAD_REQUEST, CREATED, NO_CONTENT, NOT_FOUND, OK } from 'http-status-codes';
 import { from, Observable } from 'rxjs';
-import { first, map } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
 import db from './../db/firebase-db';
 import { paramMissingError } from '@shared/constants';
@@ -57,7 +57,6 @@ router.get('/', async (req: Request, res: Response) => {
 
     from<Observable<QuerySnapshot>>(db.collection('Trophies').get())
     .pipe(
-        first(),
         map((snapshot: QuerySnapshot) => arraylizeSnapshot(snapshot))
     )
     .subscribe(
@@ -97,7 +96,6 @@ router.get('/:id', async (req: Request, res: Response) => {
 
     from<Observable<DocumentSnapshot>>(db.collection('Trophies').doc(id).get())
     .pipe(
-        first(),
         map((snapshot: DocumentSnapshot) => snapshot.data())
     )
     .subscribe(
